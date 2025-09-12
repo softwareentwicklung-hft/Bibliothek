@@ -10,22 +10,33 @@ struct Erscheinungsdatum {
 
 class Medium {
 public:
-    string titel_;
-    int seitenzahl_;
-
     Medium(string titel, int seitenzahl){
         titel_ = titel;
         seitenzahl_ = seitenzahl;
+        anzahlMedien_++;
+    }
+    virtual void anzeigen() {
+        cout << "Medium: " << titel_ << ", Seiten: " << seitenzahl_;
     }
 
-    void anzeigen() {
-        cout << "Medium: " << titel_ << ", Seiten: " << seitenzahl_ << endl;
+    int seitenzahl() {
+        return seitenzahl_;
     }
+
+    static int getAnzahlMedien() { return anzahlMedien_; }
+
+protected:
+    string titel_;
+
+private:
+    int seitenzahl_;
+    static int anzahlMedien_;
 };
+
+int Medium::anzahlMedien_ = 0;
 
 class Buch : public Medium {
 public:
-    string autor_;
     Erscheinungsdatum datum_;
     Buch(string titel, int seitenzahl, string autor, Erscheinungsdatum datum)
         : Medium(titel, seitenzahl) {
@@ -33,24 +44,29 @@ public:
         datum_ = datum;
     }
 
-    void anzeigen() {
+    void anzeigen() override {
         cout << "Buch: " << titel_ << " von " << autor_
                 << " (" << datum_.tag << "." << datum_.monat << "." << datum_.jahr << ")"
                 << endl;
     }
+
+private:
+    string autor_;
 };
 
 class Zeitschrift : public Medium {
 public:
-    int ausgabeNummer_;
     Zeitschrift(string titel, int seitenzahl, int ausgabeNummer) : Medium(titel, seitenzahl) {
         ausgabeNummer_ = ausgabeNummer;
     }
 
-    void anzeigen() {
-        cout << "Zeitschrift: " << titel_
+    void anzeigen() override {
+        Medium::anzeigen();
+        cout << " Typ Zeitschrift"
                 << ", Ausgabe: " << ausgabeNummer_ << endl;
     }
+private:
+    int ausgabeNummer_;
 };
 
 int main() {
@@ -63,6 +79,12 @@ int main() {
 
     for (auto m: medien) {
         m->anzeigen();
+    }
+
+    cout << "\nGesamtanzahl Medien: " << Medium::getAnzahlMedien() << endl;
+
+    for (auto m : medien) {
+        delete m;
     }
 
     return 0;
